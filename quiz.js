@@ -75,7 +75,8 @@ function renderQuestion(){
         إعلان داخل الكارت
       </div>
 
-      <div class="q-text">${q.q}</div>
+      <div class="q-text">${q.question}</div>
+
       <div class="answers">${opts}</div>
 
       <div class="controls">
@@ -185,3 +186,4 @@ function finishTest(){
 
 // start
 loadQuestions();
+
