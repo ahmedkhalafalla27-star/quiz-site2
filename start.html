@@ -5,53 +5,46 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>بدء الاختبار</title>
   <link rel="stylesheet" href="style.css">
-  <script src="config.js" defer></script>
+
+  <style>
+    .container{max-width:600px;margin:auto;padding:25px}
+    .info-card{
+      background:#fff;padding:25px;border-radius:15px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);text-align:center
+    }
+    .start-wrapper{margin-top:25px;display:flex;justify-content:center}
+    .start-btn{
+      background:#4a8cff;padding:16px 36px;border-radius:50px;
+      color:#fff;font-size:22px;text-decoration:none;font-weight:bold;
+      box-shadow:0 8px 20px rgba(74,140,255,.3);transition:.25s
+    }
+    .start-btn:hover{background:#3574e8;transform:scale(1.05)}
+  </style>
 </head>
+
 <body>
-  <main class="centered">
-    <div class="start-card">
+  <div class="container">
+    <div class="info-card">
       <h2>جاهز للاختبار؟</h2>
-      <p id="desc">اضغط "ابدأ الآن" وستنتقل إلى الرابط المختصر، ثم عد للموقع لبدء الاختبار.</p>
+      <p>اضغط ابدأ للدخول مباشرة إلى الأسئلة.</p>
 
       <div class="ad-slot">إعلان هنا</div>
 
-      <div style="margin-top:18px">
-        <!-- سيُملأ href عبر الجافاسكربت -->
-        <a id="startBtn" class="start-btn" target="_blank" rel="noopener">🚀 ابدأ الآن</a>
+      <div class="start-wrapper">
+        <a id="startBtn" class="start-btn">🚀 ابدأ الآن</a>
       </div>
 
-      <p style="font-size:13px;color:#666;margin-top:12px">إذا لم تُعاد تلقائيًا بعد الإعلانات، أغلق النافذة أو اضغط متابعة في صفحة الإعلانات.</p>
+      <div class="ad-slot">إعلان هنا</div>
     </div>
-  </main>
+  </div>
 
 <script>
-  // قراءة نوع الاختبار من الرابط
   const params = new URL(location.href).searchParams;
   const test = params.get("test") || "iq";
 
-  // روابط مختصرة (من ملف config.js أيضاً) — fallback هنا لو config.js لم يُحمّل
-  const SHORT = (window.SHORT_LINKS && window.SHORT_LINKS[test]) ? window.SHORT_LINKS[test] : {
-    iq: "https://shrinkme.click/minder",
-    personality: "https://shrinkme.click/personality",
-    football: "https://shrinkme.click/messicr7",
-    geo: "https://shrinkme.click/geography"
-  }[test];
-
-  const btn = document.getElementById('startBtn');
-  btn.href = SHORT;
-
-  // بعد فتح وعودة التركيز نُعيد التوجيه لصفحة الاختبار مع start=true
-  // نستخدم حدث focus: عندما يعود المستخدم من النافذة المختصرة ننتقل للاختبار
-  window.addEventListener("focus", function () {
-    // لو العنوان لا يحتوي start=true — نعيد التوجيه لبدء الاختبار
-    if (!window.location.search.includes("start=true")) {
-      // نضيف start=true عند الانتقال إلى quiz.html
-      window.location.href = `quiz.html?test=${encodeURIComponent(test)}&start=true`;
-    }
-  });
-
-  // دعم فتح الرابط المختصر تلقائياً (اختياري): لو حابب تفتح تلقائياً، فك التعليق
-  // setTimeout(()=> { window.location.href = SHORT; }, 500);
+  document.getElementById("startBtn").href =
+    `quiz.html?test=${encodeURIComponent(test)}&start=true`;
 </script>
+
 </body>
 </html>
