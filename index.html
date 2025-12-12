@@ -3,100 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>اختبارات سريعة</title>
+  <title>اختبارات سريعة — MENSA Style</title>
   <link rel="stylesheet" href="style.css">
   <script src="config.js" defer></script>
 </head>
 <body>
   <header class="site-header">
-    <h1>منصة الاختبارات</h1>
-    <p class="lead">اختر الاختبار ثم اضغط ابدأ.</p>
+    <h1>اختبارات سريعة</h1>
+    <p class="lead">اختر الاختبار المرغوب واضغط ابدأ — ستحصل على اختبار منسق ومؤقّت.</p>
   </header>
 
-  <!-- إعلان أعلى الصفحة -->
-  <div class="ad-slot">
-    إعلان أعلى الصفحة (مكان مخصص)
-  </div>
+  <div class="ad-slot">إعلان أعلى الصفحة (مكان مخصّص)</div>
 
   <main class="tests-grid">
+    <a class="test-card" href="start.html?test=iq">
+      <div class="card-inner-title">اختبار الذكاء</div>
+      <div class="card-desc">25 سؤال — مؤقّت 45 ثانية لكل سؤال</div>
+      <div class="card-action"><button class="card-btn">ابدأ</button></div>
+    </a>
 
-    <!-- اختبار الذكاء -->
-    <div class="test-card">
-      <h3>اختبار الذكاء</h3>
-      <p>25 سؤال منطقي ورياضي — مؤقّت 45 ثانية لكل سؤال</p>
+    <a class="test-card" href="start.html?test=personality">
+      <div class="card-inner-title">اختبار الشخصية</div>
+      <div class="card-desc">25 سؤال اختيارات شخصية — 45 ثانية</div>
+      <div class="card-action"><button class="card-btn">ابدأ</button></div>
+    </a>
 
-      <!-- زر ابدأ الآن (الرابط المختصر) -->
-      <div class="start-wrapper">
-        <a href="https://ouo.io/XXXXXX" class="start-btn">🚀 ابدأ الآن</a>
-      </div>
-    </div>
+    <a class="test-card" href="start.html?test=football">
+      <div class="card-inner-title">ميسي vs كريستيانو</div>
+      <div class="card-desc">25 سؤال معلومات كروية — 45 ثانية</div>
+      <div class="card-action"><button class="card-btn">ابدأ</button></div>
+    </a>
 
-    <!-- اختبار الشخصية -->
-    <div class="test-card">
-      <h3>اختبار الشخصية</h3>
-      <p>25 سؤال اختيارات شخصية — مؤقّت 45 ثانية لكل سؤال</p>
-
-      <div class="start-wrapper">
-        <a href="https://ouo.io/XXXXXX" class="start-btn">🚀 ابدأ الآن</a>
-      </div>
-    </div>
-
-    <!-- ميسي vs كريستيانو -->
-    <div class="test-card">
-      <h3>اختبار: ميسي vs كريستيانو</h3>
-      <p>25 سؤال معلومات كروية — مؤقّت 45 ثانية لكل سؤال</p>
-
-      <div class="start-wrapper">
-        <a href="https://ouo.io/XXXXXX" class="start-btn">🚀 ابدأ الآن</a>
-      </div>
-    </div>
-
-    <!-- جغرافيا -->
-    <div class="test-card">
-      <h3>اختبار جغرافيا</h3>
-      <p>25 سؤال جغرافيا — مؤقّت 45 ثانية لكل سؤال</p>
-
-      <div class="start-wrapper">
-        <a href="https://ouo.io/XXXXXX" class="start-btn">🚀 ابدأ الآن</a>
-      </div>
-    </div>
-
+    <a class="test-card" href="start.html?test=geo">
+      <div class="card-inner-title">اختبار جغرافيا</div>
+      <div class="card-desc">25 سؤال جغرافيا — 45 ثانية</div>
+      <div class="card-action"><button class="card-btn">ابدأ</button></div>
+    </a>
   </main>
 
-  <!-- إعلان أسفل الصفحة -->
-  <div class="ad-slot">
-    إعلان أسفل الصفحة (مكان مخصص)
-  </div>
+  <div class="ad-slot">إعلان أسفل الصفحة (مكان مخصّص)</div>
 
-  <footer class="site-footer">
-    © 2025 - اختبارات سريعة
-  </footer>
-
-<style>
-.start-wrapper {
-  margin-top: 15px;
-  display: flex;
-  justify-content: center;
-}
-
-.start-btn {
-  display: inline-block;
-  background: #4a8cff;
-  color: #fff;
-  padding: 12px 28px;
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 40px;
-  text-decoration: none;
-  box-shadow: 0 8px 20px rgba(74, 140, 255, 0.3);
-  transition: 0.2s;
-}
-
-.start-btn:hover {
-  background: #3574e8;
-  transform: scale(1.05);
-}
-</style>
-
+  <footer class="site-footer">© 2025 - اختبارات سريعة</footer>
 </body>
 </html>
