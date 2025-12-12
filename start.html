@@ -5,94 +5,53 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>بدء الاختبار</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    .start-wrapper {
-      margin-top: 45px;
-      display: flex;
-      justify-content: center;
-    }
-
-    .start-btn {
-      background: #4a8cff;
-      padding: 18px 38px;
-      border-radius: 50px;
-      color: #fff;
-      font-size: 22px;
-      font-weight: bold;
-      text-decoration: none;
-      display: inline-block;
-      box-shadow: 0 8px 20px rgba(74, 140, 255, 0.3);
-      transition: 0.25s;
-    }
-
-    .start-btn:hover {
-      background: #3574e8;
-      transform: scale(1.05);
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 30px;
-    }
-
-    .info-card {
-      background: #fff;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-  </style>
-
+  <script src="config.js" defer></script>
 </head>
 <body>
-
-  <div class="container">
-    <div class="info-card">
+  <main class="centered">
+    <div class="start-card">
       <h2>جاهز للاختبار؟</h2>
-      <p>اضغط ابدأ الآن للانتقال للرابط المختصر، وبعدها سيبدأ الاختبار مباشرة.</p>
+      <p id="desc">اضغط "ابدأ الآن" وستنتقل إلى الرابط المختصر، ثم عد للموقع لبدء الاختبار.</p>
 
-      <!-- إعلان أعلى -->
       <div class="ad-slot">إعلان هنا</div>
 
-      <div class="start-wrapper">
-        <a id="startBtn" class="start-btn" href="#" target="_blank">🚀 ابدأ الآن</a>
+      <div style="margin-top:18px">
+        <!-- سيُملأ href عبر الجافاسكربت -->
+        <a id="startBtn" class="start-btn" target="_blank" rel="noopener">🚀 ابدأ الآن</a>
       </div>
 
-      <!-- إعلان أسفل -->
-      <div class="ad-slot">إعلان هنا</div>
-
+      <p style="font-size:13px;color:#666;margin-top:12px">إذا لم تُعاد تلقائيًا بعد الإعلانات، أغلق النافذة أو اضغط متابعة في صفحة الإعلانات.</p>
     </div>
-  </div>
+  </main>
 
 <script>
-  const params = new URL(window.location.href).searchParams;
+  // قراءة نوع الاختبار من الرابط
+  const params = new URL(location.href).searchParams;
   const test = params.get("test") || "iq";
 
-  // روابطك المختصرة
-  const shortLinks = {
+  // روابط مختصرة (من ملف config.js أيضاً) — fallback هنا لو config.js لم يُحمّل
+  const SHORT = (window.SHORT_LINKS && window.SHORT_LINKS[test]) ? window.SHORT_LINKS[test] : {
     iq: "https://shrinkme.click/minder",
     personality: "https://shrinkme.click/personality",
     football: "https://shrinkme.click/messicr7",
     geo: "https://shrinkme.click/geography"
-  };
+  }[test];
 
-  // زر بدء
-  const btn = document.getElementById("startBtn");
-  btn.href = shortLinks[test];
+  const btn = document.getElementById('startBtn');
+  btn.href = SHORT;
 
-  // حماية منع تخطي الرابط المختصر
-  // بعد العودة من الرابط المختصر user must return with start=true
+  // بعد فتح وعودة التركيز نُعيد التوجيه لصفحة الاختبار مع start=true
+  // نستخدم حدث focus: عندما يعود المستخدم من النافذة المختصرة ننتقل للاختبار
   window.addEventListener("focus", function () {
-    // لو رجع من المختصر → نضيف start=true تلقائيًا
-    if (!window.location.href.includes("start=true")) {
-      window.location.href = `quiz.html?test=${test}&start=true`;
+    // لو العنوان لا يحتوي start=true — نعيد التوجيه لبدء الاختبار
+    if (!window.location.search.includes("start=true")) {
+      // نضيف start=true عند الانتقال إلى quiz.html
+      window.location.href = `quiz.html?test=${encodeURIComponent(test)}&start=true`;
     }
   });
-</script>
 
+  // دعم فتح الرابط المختصر تلقائياً (اختياري): لو حابب تفتح تلقائياً، فك التعليق
+  // setTimeout(()=> { window.location.href = SHORT; }, 500);
+</script>
 </body>
 </html>
