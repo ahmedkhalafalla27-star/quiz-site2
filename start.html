@@ -1,75 +1,98 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>بدء الاختبار</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 
   <style>
-    body {
-      font-family: "Cairo", sans-serif;
-      background: #f4f6fb;
-      margin: 0;
-      padding: 0;
+    .start-wrapper {
+      margin-top: 45px;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
     }
 
-    .loading-box {
+    .start-btn {
+      background: #4a8cff;
+      padding: 18px 38px;
+      border-radius: 50px;
+      color: #fff;
+      font-size: 22px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 8px 20px rgba(74, 140, 255, 0.3);
+      transition: 0.25s;
+    }
+
+    .start-btn:hover {
+      background: #3574e8;
+      transform: scale(1.05);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    .info-card {
       background: #fff;
-      padding: 30px 40px;
+      padding: 25px;
       border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       text-align: center;
-      width: 320px;
     }
 
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-
-    .dots {
-      font-size: 26px;
-      font-weight: bold;
-      letter-spacing: 5px;
-      margin-top: 10px;
-      animation: blink 1.5s infinite;
-    }
-
-    @keyframes blink {
-      0% { opacity: 0.2; }
-      50% { opacity: 1; }
-      100% { opacity: 0.2; }
-    }
   </style>
-</head>
 
+</head>
 <body>
 
-  <div class="loading-box">
-    <div class="title">جاري تجهيز الاختبار...</div>
-    <div class="dots">•••</div>
+  <div class="container">
+    <div class="info-card">
+      <h2>جاهز للاختبار؟</h2>
+      <p>اضغط ابدأ الآن للانتقال للرابط المختصر، وبعدها سيبدأ الاختبار مباشرة.</p>
+
+      <!-- إعلان أعلى -->
+      <div class="ad-slot">إعلان هنا</div>
+
+      <div class="start-wrapper">
+        <a id="startBtn" class="start-btn" href="#" target="_blank">🚀 ابدأ الآن</a>
+      </div>
+
+      <!-- إعلان أسفل -->
+      <div class="ad-slot">إعلان هنا</div>
+
+    </div>
   </div>
 
-  <script>
-    // الحصول على نوع الاختبار من الرابط
-    const test = new URL(location.href).searchParams.get("test");
+<script>
+  const params = new URL(window.location.href).searchParams;
+  const test = params.get("test") || "iq";
 
-    // لو مفيش test → رجع للصفحة الرئيسية
-    if (!test) {
-      location.href = "index.html";
+  // روابطك المختصرة
+  const shortLinks = {
+    iq: "https://shrinkme.click/minder",
+    personality: "https://shrinkme.click/personality",
+    football: "https://shrinkme.click/messicr7",
+    geo: "https://shrinkme.click/geography"
+  };
+
+  // زر بدء
+  const btn = document.getElementById("startBtn");
+  btn.href = shortLinks[test];
+
+  // حماية منع تخطي الرابط المختصر
+  // بعد العودة من الرابط المختصر user must return with start=true
+  window.addEventListener("focus", function () {
+    // لو رجع من المختصر → نضيف start=true تلقائيًا
+    if (!window.location.href.includes("start=true")) {
+      window.location.href = `quiz.html?test=${test}&start=true`;
     }
-
-    // بعد 1.5 ثانية → انقل لصفحة الاختبار مع start=true
-    setTimeout(() => {
-      location.href = `quiz.html?test=${test}&start=true`;
-    }, 1500);
-  </script>
+  });
+</script>
 
 </body>
 </html>
