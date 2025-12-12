@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>نتيجتك</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="centered">
+    <div class="card result-card" id="resultCard">
+      جاري تحميل النتيجة...
+    </div>
+  </main>
+
+<script>
+function analyze(percent){
+  if(percent >= 90) return {level:'ممتاز جداً', advice:'أداء استثنائي — حافظ على التدريب!'};
+  if(percent >= 75) return {level:'جيد جداً', advice:'أداء قوي — يمكنك التحسن للمستوى الأعلى.'};
+  if(percent >= 60) return {level:'جيد', advice:'أداء مقبول — المزيد من التدريب يساعد.'};
+  if(percent >= 40) return {level:'متوسط', advice:'حاول تحسين السرعة والدقة.'};
+  return {level:'بحاجة لتحسين', advice:'ابدأ بالتدريب اليومي على مسائل منطقية وحسابية.'};
+}
+
+(function render(){
+  const params = new URL(location.href).searchParams;
+  const test = params.get('test') || 'iq';
+  const raw = localStorage.getItem(`quiz_${test}_latest`);
+  if(!raw){
+    document.getElementById('resultCard').innerHTML = `<h2>لا توجد نتيجة محفوظة</h2><p>يرجى إنهاء الاختبار أولاً.</p><a class="btn primary" href="index.html">الصفحة الرئيسية</a>`;
+    return;
+  }
+  const res = JSON.parse(raw);
+  const perf = analyze(res.percent);
+  document.getElementById('resultCard').innerHTML = `
+    <h2>النتيجة — ${res.percent}%</h2>
+    <div class="score-visual"><div class="circle">${res.score} / ${res.total}</div></div>
+    <h3>${perf.level}</h3>
+    <p>${perf.advice}</p>
+
+    <!-- إعلان فوق الأزرار -->
+    <div class="ad-slot">
+      <!-- ضع كود AdSense هنا (إعلان فوق الأزرار) -->
+    </div>
+
+    <div style="margin-top:14px">
+      <a class="btn primary" href="start.html?test=${encodeURIComponent(test)}">أعد المحاولة</a>
+      <a class="btn ghost" href="index.html">اختبارات أخرى</a>
+    </div>
+
+    <!-- إعلان أسفل النتيجة -->
+    <div class="ad-slot">
+      <!-- ضع كود AdSense هنا (إعلان أسفل النتيجة) -->
+    </div>
+  `;
+})();
+</script>
+</body>
+</html>

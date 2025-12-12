@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>جاري التهيئة...</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js" defer></script>
+</head>
+<body>
+  <main class="centered">
+    <div class="card">
+      <h2>الانتقال للاختبار...</h2>
+      <p>ستتم إعادة توجيهك خلال ثوانٍ. إذا لم يحدث شيء، اضغط متابعة.</p>
+
+      <div style="margin-top:16px">
+        <a id="manualBtn" class="btn primary" href="#">متابعة</a>
+        <a id="skipBtn" class="btn ghost" href="quiz.html?start=true">تخطي (لدخول الاختبار مباشرة)</a>
+      </div>
+    </div>
+  </main>
+
+<script>
+  // تحديد الاختبار من المعامل
+  const params = new URLSearchParams(location.search);
+  const test = params.get("test") || "iq";
+
+  // رابط مختصر من config.js (SHORT_LINKS)
+  const short = (typeof SHORT_LINKS !== 'undefined' && SHORT_LINKS[test]) ? SHORT_LINKS[test] : null;
+
+  // تابع لفتح الرابط المختصر (إن وُجد)
+  function openShort(){
+    if(short){
+      // افتح الرابط المختصر في نافذة جديدة ثم نراقب حدث التركيز للعودة
+      window.location.href = short;
+    } else {
+      // لو مفيش رابط مختصر معرف، نفتح الاختبار مباشرة
+      location.href = `quiz.html?test=${encodeURIComponent(test)}&start=true`;
+    }
+  }
+
+  document.getElementById('manualBtn').href = short ? short : `quiz.html?test=${encodeURIComponent(test)}&start=true`;
+
+  // تحويل آلي بعد نص ثانية
+  setTimeout(openShort, 600);
+
+  // عند رجوع المستخدم (focus) نعيده لصفحة الاختبار مع فلاغ start=true
+  window.addEventListener('focus', () => {
+    location.href = `quiz.html?test=${encodeURIComponent(test)}&start=true`;
+  });
+</script>
+</body>
+</html>
