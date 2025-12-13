@@ -3,7 +3,14 @@ const TIME_PER_QUESTION = 45;
 const AD_INDICES = [9,19,29];
 
 let QUESTIONS=[];
-let testName=new URL(location.href).searchParams.get('test')||'iq';
+let params=new URL(location.href).searchParams;
+let testName=params.get('test')||'iq';
+let allowStart=params.get('start')==='true';
+
+if(!allowStart){
+  location.href="index.html";
+}
+
 let index=Number(localStorage.getItem(`quiz_${testName}_index`)||0);
 let answers=JSON.parse(localStorage.getItem(`quiz_${testName}_answers`)||'[]');
 let remaining=Number(localStorage.getItem(`quiz_${testName}_remaining`)||TIME_PER_QUESTION);
@@ -52,8 +59,7 @@ function renderQuestion(){
         </div>
       </div>
 
-      <div class="ad-slot small-ad">إعلان داخل الكارت</div>
-
+      <div class="ad-slot small-ad">إعلان</div>
       <div class="q-text">${q.question}</div>
       <div class="answers">${opts}</div>
 
@@ -76,15 +82,20 @@ function renderQuestion(){
 
   document.getElementById("prevBtn").onclick=()=>{
     if(index>0){
-      index--; remaining=TIME_PER_QUESTION; saveProgress(); renderQuestion();
+      index--; remaining=TIME_PER_QUESTION;
+      saveProgress(); renderQuestion();
     }
   };
 
   document.getElementById("nextBtn").onclick=()=>{
-    index++; remaining=TIME_PER_QUESTION; saveProgress(); renderQuestion();
+    if(answers[index]===null){
+      if(!confirm("لم تختَر إجابة، هل تريد المتابعة؟")) return;
+    }
+    index++; remaining=TIME_PER_QUESTION;
+    saveProgress(); renderQuestion();
   };
 
-  document.getElementById("saveBtn").onclick=()=>alert("تم الحفظ");
+  document.getElementById("saveBtn").onclick=()=>alert("تم حفظ التقدم");
   document.getElementById("exitBtn").onclick=()=>location.href="index.html";
 
   startTimer();
@@ -95,13 +106,10 @@ function startTimer(){
   timerInterval=setInterval(()=>{
     remaining--;
     document.getElementById('timer').textContent=remaining;
-
     if(remaining<=0){
       clearTimer();
-      index++;
-      remaining=TIME_PER_QUESTION;
-      saveProgress();
-      renderQuestion();
+      index++; remaining=TIME_PER_QUESTION;
+      saveProgress(); renderQuestion();
     }else{
       localStorage.setItem(`quiz_${testName}_remaining`,remaining);
     }
@@ -122,12 +130,16 @@ function finishTest(){
   for(let i=0;i<QUESTIONS.length;i++){
     if(answers[i]===QUESTIONS[i].answer) correct++;
   }
-  const result={
+  localStorage.setItem(`quiz_${testName}_latest`,JSON.stringify({
     score:correct,
     total:QUESTIONS.length,
     percent:Math.round(correct/QUESTIONS.length*100)
-  };
-  localStorage.setItem(`quiz_${testName}_latest`,JSON.stringify(result));
+  }));
+
+  localStorage.removeItem(`quiz_${testName}_index`);
+  localStorage.removeItem(`quiz_${testName}_answers`);
+  localStorage.removeItem(`quiz_${testName}_remaining`);
+
   location.href=`result.html?test=${testName}`;
 }
 
