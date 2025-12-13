@@ -1,146 +1,70 @@
-// quiz.js
-const TIME_PER_QUESTION = 45;
-const AD_INDICES = [9,19,29];
+const TIME = 45;
+let QUESTIONS = [];
+let index = 0;
+let answers = [];
+let timer;
+let remaining = TIME;
 
-let QUESTIONS=[];
-let params=new URL(location.href).searchParams;
-let testName=params.get('test')||'iq';
-let allowStart=params.get('start')==='true';
+const test = new URLSearchParams(location.search).get("test");
+const card = document.getElementById("quizCard");
 
-if(!allowStart){
-  location.href="index.html";
-}
-
-let index=Number(localStorage.getItem(`quiz_${testName}_index`)||0);
-let answers=JSON.parse(localStorage.getItem(`quiz_${testName}_answers`)||'[]');
-let remaining=Number(localStorage.getItem(`quiz_${testName}_remaining`)||TIME_PER_QUESTION);
-let timerInterval=null;
-
-function ensureAnswers(len){
-  if(!Array.isArray(answers)) answers=[];
-  while(answers.length<len) answers.push(null);
-}
-
-const card=document.getElementById('quizCard');
-
-async function loadQuestions(){
-  try{
-    const res=await fetch(`data/${testName}.json?v=${Date.now()}`);
-    if(!res.ok) throw new Error("فشل تحميل الأسئلة");
-    QUESTIONS=await res.json();
-    ensureAnswers(QUESTIONS.length);
-    renderQuestion();
-  }catch(e){
-    card.innerHTML=`<div class="card"><p>خطأ: ${e.message}</p></div>`;
-  }
-}
-
-function renderQuestion(){
-  if(index>=QUESTIONS.length){ finishTest(); return; }
-
-  const q=QUESTIONS[index];
-  const opts=q.options.map((o,i)=>`
-    <div class="answer ${answers[index]===i?'selected':''}" data-i="${i}">
-      <span class="opt-letter">${String.fromCharCode(65+i)}</span>
-      <div class="opt-text">${o}</div>
-    </div>
-  `).join("");
-
-  const showMidAd = AD_INDICES.includes(index);
-
-  card.innerHTML=`
-    <div class="card-inner">
-      <div class="card-header">
-        <div class="timer-box">⏳ <span id="timer">${remaining}</span> ثانية</div>
-        <div class="progress-box">السؤال ${index+1} / ${QUESTIONS.length}</div>
-        <div class="action-box">
-          <button class="save-btn" id="saveBtn">💾 حفظ</button>
-          <button class="exit-btn" id="exitBtn">🚪 خروج</button>
-        </div>
-      </div>
-
-      <div class="ad-slot small-ad">إعلان</div>
-      <div class="q-text">${q.question}</div>
-      <div class="answers">${opts}</div>
-
-      <div class="controls">
-        <button class="btn secondary" id="prevBtn" ${index===0?'disabled':''}>السابق</button>
-        <button class="btn primary" id="nextBtn">${index===QUESTIONS.length-1?'إنهاء':'التالي'}</button>
-      </div>
-    </div>
-    ${ showMidAd ? `<div class="ad-slot mid-ad">إعلان</div>` : '' }
-  `;
-
-  document.querySelectorAll(".answer").forEach(el=>{
-    el.onclick=()=>{
-      answers[index]=Number(el.dataset.i);
-      saveProgress();
-      document.querySelectorAll(".answer").forEach(a=>a.classList.remove("selected"));
-      el.classList.add("selected");
-    };
+fetch(`data/${test}.json`)
+  .then(res => res.json())
+  .then(data => {
+    QUESTIONS = data;
+    answers = Array(QUESTIONS.length).fill(null);
+    render();
   });
 
-  document.getElementById("prevBtn").onclick=()=>{
-    if(index>0){
-      index--; remaining=TIME_PER_QUESTION;
-      saveProgress(); renderQuestion();
-    }
-  };
+function render() {
+  if (index >= QUESTIONS.length) return finish();
 
-  document.getElementById("nextBtn").onclick=()=>{
-    if(answers[index]===null){
-      if(!confirm("لم تختَر إجابة، هل تريد المتابعة؟")) return;
-    }
-    index++; remaining=TIME_PER_QUESTION;
-    saveProgress(); renderQuestion();
-  };
-
-  document.getElementById("saveBtn").onclick=()=>alert("تم حفظ التقدم");
-  document.getElementById("exitBtn").onclick=()=>location.href="index.html";
-
+  const q = QUESTIONS[index];
+  card.innerHTML = `
+    <div class="q-header">
+      ⏱️ <span id="timer">${remaining}</span> | سؤال ${index + 1}/${QUESTIONS.length}
+    </div>
+    <div class="q-text">${q.question}</div>
+    <div class="answers">
+      ${q.options.map((o, i) => `
+        <div class="answer" onclick="select(${i})">${o}</div>
+      `).join("")}
+    </div>
+    <button class="btn primary" onclick="next()">التالي</button>
+  `;
   startTimer();
 }
 
-function startTimer(){
-  clearTimer();
-  timerInterval=setInterval(()=>{
+function select(i) {
+  answers[index] = i;
+}
+
+function next() {
+  clearInterval(timer);
+  remaining = TIME;
+  index++;
+  render();
+}
+
+function startTimer() {
+  timer = setInterval(() => {
     remaining--;
-    document.getElementById('timer').textContent=remaining;
-    if(remaining<=0){
-      clearTimer();
-      index++; remaining=TIME_PER_QUESTION;
-      saveProgress(); renderQuestion();
-    }else{
-      localStorage.setItem(`quiz_${testName}_remaining`,remaining);
-    }
-  },1000);
+    document.getElementById("timer").textContent = remaining;
+    if (remaining === 0) next();
+  }, 1000);
 }
 
-function clearTimer(){ if(timerInterval) clearInterval(timerInterval); }
+function finish() {
+  let score = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (answers[i] === q.answer) score++;
+  });
 
-function saveProgress(){
-  localStorage.setItem(`quiz_${testName}_index`,index);
-  localStorage.setItem(`quiz_${testName}_answers`,JSON.stringify(answers));
-  localStorage.setItem(`quiz_${testName}_remaining`,remaining);
-}
-
-function finishTest(){
-  clearTimer();
-  let correct=0;
-  for(let i=0;i<QUESTIONS.length;i++){
-    if(answers[i]===QUESTIONS[i].answer) correct++;
-  }
-  localStorage.setItem(`quiz_${testName}_latest`,JSON.stringify({
-    score:correct,
-    total:QUESTIONS.length,
-    percent:Math.round(correct/QUESTIONS.length*100)
+  localStorage.setItem(`quiz_${test}_latest`, JSON.stringify({
+    score,
+    total: QUESTIONS.length,
+    percent: Math.round(score / QUESTIONS.length * 100)
   }));
 
-  localStorage.removeItem(`quiz_${testName}_index`);
-  localStorage.removeItem(`quiz_${testName}_answers`);
-  localStorage.removeItem(`quiz_${testName}_remaining`);
-
-  location.href=`result.html?test=${testName}`;
+  location.href = `result.html?test=${test}`;
 }
-
-loadQuestions();
