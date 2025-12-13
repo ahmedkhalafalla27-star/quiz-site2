@@ -1,49 +1,26 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
   <title>بدء الاختبار</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    .container{max-width:600px;margin:auto;padding:25px}
-    .info-card{
-      background:#fff;padding:25px;border-radius:15px;
-      box-shadow:0 5px 15px rgba(0,0,0,0.1);text-align:center
-    }
-    .start-wrapper{margin-top:25px;display:flex;justify-content:center}
-    .start-btn{
-      background:#4a8cff;padding:16px 36px;border-radius:50px;
-      color:#fff;font-size:22px;text-decoration:none;font-weight:bold;
-      box-shadow:0 8px 20px rgba(74,140,255,.3);transition:.25s
-    }
-    .start-btn:hover{background:#3574e8;transform:scale(1.05)}
-  </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="info-card">
-      <h2>جاهز للاختبار؟</h2>
-      <p>اضغط ابدأ للدخول مباشرة إلى الأسئلة.</p>
 
-      <div class="ad-slot">إعلان هنا</div>
+<main class="centered">
+  <div class="start-card">
+    <h2>جاهز للتحدي؟</h2>
+    <p>25 سؤال – 45 ثانية لكل سؤال</p>
 
-      <div class="start-wrapper">
-        <a id="startBtn" class="start-btn">🚀 ابدأ الآن</a>
-      </div>
-
-      <div class="ad-slot">إعلان هنا</div>
-    </div>
+    <a id="startBtn" class="start-btn">🚀 ابدأ الاختبار</a>
   </div>
+</main>
 
 <script>
-  const params = new URL(location.href).searchParams;
-  const test = params.get("test") || "iq";
-
-  document.getElementById("startBtn").href =
-    `quiz.html?test=${encodeURIComponent(test)}&start=true`;
+  const params = new URLSearchParams(location.search);
+  const test = params.get("test");
+  document.getElementById("startBtn").href = `quiz.html?test=${test}`;
 </script>
 
 </body>
