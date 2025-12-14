@@ -41,7 +41,8 @@ function renderQuestion() {
 
       <div class="answers">
         ${q.options.map((o, i) => `
-          <div class="answer" onclick="selectAnswer(${i})">
+          <div class="answer ${answers[index] === i ? 'selected' : ''}"
+               onclick="selectAnswer(${i})">
             ${o}
           </div>
         `).join("")}
@@ -56,9 +57,21 @@ function renderQuestion() {
 
 function selectAnswer(i) {
   answers[index] = i;
+
+  // تمييز الإجابة المختارة
+  document.querySelectorAll('.answer').forEach(a =>
+    a.classList.remove('selected')
+  );
+  document.querySelectorAll('.answer')[i].classList.add('selected');
 }
 
 function next() {
+  // ❌ منع الانتقال بدون إجابة
+  if (answers[index] === null) {
+    alert("من فضلك اختر إجابة قبل الانتقال للسؤال التالي");
+    return;
+  }
+
   clearInterval(timer);
   remaining = TIME_PER_QUESTION;
   index++;
@@ -66,10 +79,18 @@ function next() {
 }
 
 function startTimer() {
+  clearInterval(timer);
+
   timer = setInterval(() => {
     remaining--;
     document.getElementById("timer").textContent = remaining;
-    if (remaining <= 0) next();
+
+    // ⛔ الوقت انتهى ولا توجد إجابة → لا ينتقل
+    if (remaining <= 0) {
+      clearInterval(timer);
+      alert("انتهى الوقت! اختر إجابة للمتابعة");
+      remaining = 0;
+    }
   }, 1000);
 }
 
