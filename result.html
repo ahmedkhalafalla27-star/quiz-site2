@@ -1,44 +1,130 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>النتيجة</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>نتيجتك</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Facebook Open Graph -->
+  <meta property="og:title" content="اختبر قدراتك ومعلوماتك" />
+  <meta property="og:description" content="جرب الاختبار واعرف مستواك الحقيقي 👇" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="" />
+
+  <style>
+    .share-btn {
+      background: #1877f2;
+      color: #fff;
+      padding: 14px 26px;
+      border-radius: 40px;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 12px;
+    }
+    .share-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
 <body>
 
 <main class="centered">
-  <div class="card result-card" id="result"></div>
+  <div class="card result-card" id="resultCard">
+    جاري تحميل النتيجة...
+  </div>
 </main>
 
-<div class="ad-slot">إعلان AdSense</div>
-
 <script>
-const params = new URLSearchParams(location.search);
-const test = params.get("test");
-const data = JSON.parse(localStorage.getItem(`result_${test}`));
+(function () {
 
-const percent = Math.round(data.score / data.total * 100);
+  const params = new URLSearchParams(location.search);
+  const test = params.get("test");
 
-let level = "متوسط";
-if (percent >= 85) level = "ممتاز";
-else if (percent >= 65) level = "جيد";
-else if (percent < 40) level = "ضعيف";
+  const data = JSON.parse(localStorage.getItem(`result_${test}`));
 
-document.getElementById("result").innerHTML = `
-  <h2>نتيجتك ${percent}%</h2>
-  <p>تقييمك: <strong>${level}</strong></p>
+  if (!data) {
+    document.getElementById("resultCard").innerHTML = `
+      <h2>لا توجد نتيجة</h2>
+      <a class="btn primary" href="index.html">العودة للرئيسية</a>
+    `;
+    return;
+  }
 
-  <a class="btn primary"
-     target="_blank"
-     href="https://www.facebook.com/sharer/sharer.php?u=${location.origin}">
-     مشاركة على فيسبوك
-  </a>
+  const percent = Math.round((data.score / data.total) * 100);
 
-  <br><br>
-  <a href="index.html">اختبارات أخرى</a>
-`;
+  // 🔹 تقييم عام
+  function evaluate(p) {
+    if (p >= 90) return "🔥 عبقري حقيقي";
+    if (p >= 75) return "💪 ذكاء قوي جدًا";
+    if (p >= 60) return "👍 مستوى جيد";
+    if (p >= 40) return "🙂 متوسط";
+    return "⚠️ يحتاج تطوير";
+  }
+
+  const level = evaluate(percent);
+
+  // 🔹 نص المشاركة حسب نوع الاختبار
+  const shareTexts = {
+    iq: `🧠 حصلت على ${percent}% في اختبار الذكاء! هل تقدر تتحداني؟`,
+    analytical_thinking: `🔍 مستواي ${percent}% في التفكير التحليلي!`,
+    math_logic_iq: `🧮 نتيجتي ${percent}% في اختبار الذكاء الرياضي!`,
+    decision_personality: `👤 شخصيتي اتحددت! نتيجتي ${percent}%`,
+    fun_general_knowledge: `🌍 نتيجتي ${percent}% في المعلومات العامة!`,
+    football: `⚽ أنا فاهم كورة بنسبة ${percent}% 😎`,
+    quran_hifz: `📖 اختبرت حفظي للقرآن وطلعت ${percent}%`,
+    default: `🔥 جربت اختبار جديد وطلعت نتيجتي ${percent}%`
+  };
+
+  const shareText = shareTexts[test] || shareTexts.default;
+
+  const shareUrl = location.origin + "/index.html";
+
+  // 🔹 رابط مشاركة فيسبوك (يفتح التطبيق لو موجود)
+  const fbAppLink = `fb://facewebmodal/f?href=https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+
+  const fbWebLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+
+  document.getElementById("resultCard").innerHTML = `
+    <h2>نتيجتك: ${percent}%</h2>
+    <div class="score-visual">
+      <div class="circle">${data.score} / ${data.total}</div>
+    </div>
+
+    <h3>${level}</h3>
+
+    <!-- إعلان أعلى النتيجة -->
+    <div class="ad-slot">مكان إعلان</div>
+
+    <a href="#" id="shareBtn" class="share-btn">📤 شارك نتيجتك على فيسبوك</a>
+
+    <div style="margin-top:14px">
+      <a class="btn primary" href="start.html?test=${test}">إعادة الاختبار</a>
+      <a class="btn ghost" href="index.html">اختبارات أخرى</a>
+    </div>
+
+    <!-- إعلان أسفل النتيجة -->
+    <div class="ad-slot">مكان إعلان</div>
+  `;
+
+  // 🔹 محاولة فتح تطبيق فيسبوك
+  document.getElementById("shareBtn").addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const start = Date.now();
+    location.href = fbAppLink;
+
+    // لو التطبيق غير موجود → افتح الويب
+    setTimeout(() => {
+      if (Date.now() - start < 1500) {
+        window.open(fbWebLink, "_blank");
+      }
+    }, 1000);
+  });
+
+})();
 </script>
 
 </body>
