@@ -11,11 +11,21 @@ const test = params.get("test");
 
 const card = document.getElementById("quizCard");
 
+// 🔹 تحميل التقدم إن وُجد
+index = Number(localStorage.getItem(`quiz_${test}_index`) || 0);
+answers = JSON.parse(localStorage.getItem(`quiz_${test}_answers`) || "[]");
+remaining = Number(localStorage.getItem(`quiz_${test}_remaining`) || TIME_PER_QUESTION);
+
 async function loadQuestions() {
   try {
     const res = await fetch(`data/${test}.json`);
     QUESTIONS = await res.json();
-    answers = new Array(QUESTIONS.length).fill(null);
+
+    // تأكيد طول الإجابات
+    while (answers.length < QUESTIONS.length) {
+      answers.push(null);
+    }
+
     renderQuestion();
   } catch {
     card.innerHTML = "فشل تحميل الأسئلة";
@@ -57,8 +67,8 @@ function renderQuestion() {
 
 function selectAnswer(i) {
   answers[index] = i;
+  saveProgress();
 
-  // تمييز الإجابة المختارة
   document.querySelectorAll('.answer').forEach(a =>
     a.classList.remove('selected')
   );
@@ -66,16 +76,13 @@ function selectAnswer(i) {
 }
 
 function next() {
-  // ❌ منع الانتقال بدون إجابة
-  if (answers[index] === null) {
-    alert("من فضلك اختر إجابة قبل الانتقال للسؤال التالي");
+  // ❌ لو لسه في وقت ومافيش إجابة → امنع
+  if (remaining > 0 && answers[index] === null) {
+    alert("يجب اختيار إجابة قبل الانتقال للسؤال التالي");
     return;
   }
 
-  clearInterval(timer);
-  remaining = TIME_PER_QUESTION;
-  index++;
-  renderQuestion();
+  moveToNextQuestion();
 }
 
 function startTimer() {
@@ -84,17 +91,34 @@ function startTimer() {
   timer = setInterval(() => {
     remaining--;
     document.getElementById("timer").textContent = remaining;
+    saveProgress();
 
-    // ⛔ الوقت انتهى ولا توجد إجابة → لا ينتقل
+    // ⏰ الوقت انتهى → انتقل تلقائيًا (وتتحسب خطأ)
     if (remaining <= 0) {
       clearInterval(timer);
-      alert("انتهى الوقت! اختر إجابة للمتابعة");
-      remaining = 0;
+      answers[index] = null; // إجابة خطأ
+      moveToNextQuestion();
     }
   }, 1000);
 }
 
+function moveToNextQuestion() {
+  clearInterval(timer);
+  index++;
+  remaining = TIME_PER_QUESTION;
+  saveProgress();
+  renderQuestion();
+}
+
+function saveProgress() {
+  localStorage.setItem(`quiz_${test}_index`, index);
+  localStorage.setItem(`quiz_${test}_answers`, JSON.stringify(answers));
+  localStorage.setItem(`quiz_${test}_remaining`, remaining);
+}
+
 function finish() {
+  clearInterval(timer);
+
   let score = 0;
   QUESTIONS.forEach((q, i) => {
     if (answers[i] === q.answer) score++;
@@ -104,6 +128,11 @@ function finish() {
     score,
     total: QUESTIONS.length
   }));
+
+  // تنظيف التقدم
+  localStorage.removeItem(`quiz_${test}_index`);
+  localStorage.removeItem(`quiz_${test}_answers`);
+  localStorage.removeItem(`quiz_${test}_remaining`);
 
   location.href = `result.html?test=${test}`;
 }
