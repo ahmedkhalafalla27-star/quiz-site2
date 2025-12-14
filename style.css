@@ -1,75 +1,318 @@
+/* =========================
+   إعدادات عامة
+========================= */
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: Tahoma, Arial;
-  background: #f4f6fb;
-  color: #222;
+  padding: 16px;
+  font-family: "Cairo", Arial, sans-serif;
+  background: #f4f7fb;
+  color: #0b1220;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =========================
+   الهيدر
+========================= */
 .site-header {
-  background: #4a8cff;
-  color: #fff;
-  padding: 25px;
   text-align: center;
+  margin-bottom: 20px;
 }
 
+.site-header h1 {
+  margin: 0 0 8px;
+  color: #1e40af;
+}
+
+.site-header p {
+  margin: 0;
+  color: #334155;
+  font-size: 16px;
+}
+
+/* =========================
+   شبكة الاختبارات
+========================= */
 .tests-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap: 15px;
-  padding: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto 30px;
 }
 
 .test-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: #000;
-  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.test-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.12);
+}
+
+.test-card h3 {
+  margin: 0 0 8px;
+  color: #2563eb;
+  font-size: 18px;
+}
+
+.test-card p {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: #475569;
+}
+
+/* زر ابدأ */
+.start-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.start-btn {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #fff;
+  padding: 12px 26px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 40px;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+  transition: 0.25s;
+}
+
+.start-btn:hover {
+  transform: scale(1.06);
+  opacity: 0.95;
+}
+
+/* =========================
+   الإعلانات
+========================= */
+.ad-slot {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  color: #64748b;
+  border-radius: 12px;
+  padding: 14px;
+  margin: 16px auto;
+  max-width: 1100px;
+  text-align: center;
+  font-size: 14px;
+  min-height: 60px;
+}
+
+.small-ad {
+  font-size: 13px;
+  padding: 10px;
+}
+
+.mid-ad {
+  margin-top: 14px;
+}
+
+/* =========================
+   صفحة الاختبار
+========================= */
 .centered {
   display: flex;
   justify-content: center;
-  padding: 30px;
+  align-items: flex-start;
+  min-height: 75vh;
 }
 
-.quiz-card, .start-card, .result-card {
-  background: #fff;
-  padding: 25px;
-  border-radius: 14px;
+.quiz-card {
   width: 100%;
-  max-width: 500px;
+  max-width: 760px;
+}
+
+.card-inner {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* رأس الكارت */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.timer-box {
+  font-weight: bold;
+  color: #dc2626;
+}
+
+.progress-box {
+  font-weight: bold;
+  color: #0f172a;
+}
+
+.action-box {
+  display: flex;
+  gap: 6px;
+}
+
+.save-btn,
+.exit-btn {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* السؤال */
+.q-text {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 6px;
+}
+
+/* الإجابات */
+.answers {
+  display: grid;
+  gap: 12px;
 }
 
 .answer {
-  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 12px;
-  margin: 8px 0;
-  border-radius: 8px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   cursor: pointer;
+  transition: 0.15s;
 }
 
 .answer:hover {
-  background: #dbe4ff;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.08);
+}
+
+.answer.selected {
+  background: linear-gradient(90deg, #e0ecff, #f5faff);
+  border-color: #93c5fd;
+}
+
+.opt-letter {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #e2e8f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* أزرار التحكم */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn.primary {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.btn.secondary {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+}
+
+/* =========================
+   صفحة النتيجة
+========================= */
+.result-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+  text-align: center;
+  max-width: 600px;
+}
+
+.score-visual {
+  display: flex;
+  justify-content: center;
+  margin: 14px 0;
+}
+
+.circle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 10px solid rgba(37, 99, 235, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* زر مشاركة */
+.share-btn {
   display: inline-block;
-  padding: 12px 25px;
-  border-radius: 30px;
-  text-decoration: none;
-  text-align: center;
-}
-
-.primary {
-  background: #4a8cff;
+  margin-top: 12px;
+  background: #1877f2;
   color: #fff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: bold;
 }
 
-.ad-slot {
-  margin: 20px;
+/* =========================
+   الفوتر
+========================= */
+.site-footer {
   text-align: center;
-  background: #eee;
-  padding: 20px;
+  margin-top: 30px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* =========================
+   موبايل
+========================= */
+@media (max-width: 720px) {
+  .q-text {
+    font-size: 18px;
+  }
+  .test-card h3 {
+    font-size: 17px;
+  }
 }
