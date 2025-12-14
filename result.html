@@ -2,33 +2,20 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ===== Open Graph (Facebook) ===== -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="اختبر قدراتك">
+  <meta property="og:title" id="ogTitle" content="اختبر قدراتك">
+  <meta property="og:description" id="ogDesc" content="اكتشف مستواك الحقيقي الآن">
+  <meta property="og:image" id="ogImage" content="assets/social/default.jpg">
+  <meta property="og:url" id="ogUrl" content="">
+
   <title>نتيجتك</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Facebook Open Graph -->
-  <meta property="og:title" content="اختبر قدراتك ومعلوماتك" />
-  <meta property="og:description" content="جرب الاختبار واعرف مستواك الحقيقي 👇" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="" />
-
-  <style>
-    .share-btn {
-      background: #1877f2;
-      color: #fff;
-      padding: 14px 26px;
-      border-radius: 40px;
-      font-size: 18px;
-      font-weight: bold;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 12px;
-    }
-    .share-btn:hover {
-      opacity: 0.9;
-    }
-  </style>
 </head>
+
 <body>
 
 <main class="centered">
@@ -38,12 +25,66 @@
 </main>
 
 <script>
+/* ===== إعدادات المشاركة حسب نوع الاختبار ===== */
+const TEST_CONFIG = {
+  iq: {
+    title: "🧠 اختبار الذكاء",
+    share: "🔥 اختبرت ذكائي وطلعت نتيجة قوية! جرب الاختبار وشوف مستواك 👇",
+    image: "assets/social/iq.jpg"
+  },
+  personality: {
+    title: "👤 اختبار الشخصية",
+    share: "👀 طلعت شخصيتي مختلفة عن المتوقع! جرب واعرف شخصيتك 👇",
+    image: "assets/social/personality.jpg"
+  },
+  math_logic_iq: {
+    title: "🧮 اختبار التفكير المنطقي",
+    share: "🧮 اختبار منطقي محتاج تركيز! تقدر تعديه؟ 👇",
+    image: "assets/social/math.jpg"
+  },
+  football: {
+    title: "⚽ اختبار كروي",
+    share: "⚽ تحدي كروي جامد! جرب معلوماتك 👇",
+    image: "assets/social/football.jpg"
+  },
+  geo: {
+    title: "🌍 اختبار جغرافيا",
+    share: "🌍 معلومات جغرافية هتخليك تعيد التفكير 👇",
+    image: "assets/social/geo.jpg"
+  },
+  fun_general_knowledge: {
+    title: "💡 معلومات عامة",
+    share: "💡 أسئلة مش مملة خالص! جرب بنفسك 👇",
+    image: "assets/social/general.jpg"
+  },
+  quran_hifz: {
+    title: "📖 اختبر حفظك للقرآن",
+    share: "📖 اختبرت حفظي للقرآن.. هل تستطيع؟ 👇",
+    image: "assets/social/quran.jpg"
+  }
+};
+
+/* ===== تحليل النتيجة ===== */
+function analyze(percent) {
+  if (percent >= 85) return "🔥 مستوى ممتاز جدًا";
+  if (percent >= 65) return "💪 مستوى قوي";
+  if (percent >= 45) return "👍 مستوى متوسط";
+  return "📘 يحتاج تدريب";
+}
+
+/* ===== عرض النتيجة ===== */
 (function () {
-
   const params = new URLSearchParams(location.search);
-  const test = params.get("test");
+  const test = params.get("test") || "iq";
 
-  const data = JSON.parse(localStorage.getItem(`result_${test}`));
+  const cfg = TEST_CONFIG[test] || {
+    title: "اختبر قدراتك",
+    share: "جرب اختبر قدراتك واعرف مستواك الحقيقي 👇",
+    image: "assets/social/default.jpg"
+  };
+
+  const data = localStorage.getItem(`result_${test}`) ||
+               localStorage.getItem(`quiz_${test}_latest`);
 
   if (!data) {
     document.getElementById("resultCard").innerHTML = `
@@ -53,77 +94,50 @@
     return;
   }
 
-  const percent = Math.round((data.score / data.total) * 100);
+  const result = JSON.parse(data);
+  const percent = Math.round((result.score / result.total) * 100);
+  const analysis = analyze(percent);
 
-  // 🔹 تقييم عام
-  function evaluate(p) {
-    if (p >= 90) return "🔥 عبقري حقيقي";
-    if (p >= 75) return "💪 ذكاء قوي جدًا";
-    if (p >= 60) return "👍 مستوى جيد";
-    if (p >= 40) return "🙂 متوسط";
-    return "⚠️ يحتاج تطوير";
-  }
-
-  const level = evaluate(percent);
-
-  // 🔹 نص المشاركة حسب نوع الاختبار
-  const shareTexts = {
-    iq: `🧠 حصلت على ${percent}% في اختبار الذكاء! هل تقدر تتحداني؟`,
-    analytical_thinking: `🔍 مستواي ${percent}% في التفكير التحليلي!`,
-    math_logic_iq: `🧮 نتيجتي ${percent}% في اختبار الذكاء الرياضي!`,
-    decision_personality: `👤 شخصيتي اتحددت! نتيجتي ${percent}%`,
-    fun_general_knowledge: `🌍 نتيجتي ${percent}% في المعلومات العامة!`,
-    football: `⚽ أنا فاهم كورة بنسبة ${percent}% 😎`,
-    quran_hifz: `📖 اختبرت حفظي للقرآن وطلعت ${percent}%`,
-    default: `🔥 جربت اختبار جديد وطلعت نتيجتي ${percent}%`
-  };
-
-  const shareText = shareTexts[test] || shareTexts.default;
-
-  const shareUrl = location.origin + "/index.html";
-
-  // 🔹 رابط مشاركة فيسبوك (يفتح التطبيق لو موجود)
-  const fbAppLink = `fb://facewebmodal/f?href=https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
-
-  const fbWebLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+  /* تحديث OG */
+  document.getElementById("ogTitle").content = cfg.title;
+  document.getElementById("ogDesc").content = cfg.share;
+  document.getElementById("ogImage").content = location.origin + "/" + cfg.image;
+  document.getElementById("ogUrl").content = location.href;
 
   document.getElementById("resultCard").innerHTML = `
-    <h2>نتيجتك: ${percent}%</h2>
-    <div class="score-visual">
-      <div class="circle">${data.score} / ${data.total}</div>
-    </div>
+    <h2>${cfg.title}</h2>
 
-    <h3>${level}</h3>
+    <div class="circle">${percent}%</div>
 
-    <!-- إعلان أعلى النتيجة -->
-    <div class="ad-slot">مكان إعلان</div>
+    <h3>${analysis}</h3>
+    <p>إجابات صحيحة: <b>${result.score}</b> من <b>${result.total}</b></p>
 
-    <a href="#" id="shareBtn" class="share-btn">📤 شارك نتيجتك على فيسبوك</a>
+    <div class="ad-slot">إعلان هنا</div>
 
-    <div style="margin-top:14px">
-      <a class="btn primary" href="start.html?test=${test}">إعادة الاختبار</a>
+    <div style="margin-top:20px">
+      <button class="btn primary" id="shareBtn">📤 مشاركة على فيسبوك</button>
+      <br><br>
       <a class="btn ghost" href="index.html">اختبارات أخرى</a>
     </div>
-
-    <!-- إعلان أسفل النتيجة -->
-    <div class="ad-slot">مكان إعلان</div>
   `;
 
-  // 🔹 محاولة فتح تطبيق فيسبوك
-  document.getElementById("shareBtn").addEventListener("click", function (e) {
-    e.preventDefault();
+  /* زر المشاركة */
+  document.getElementById("shareBtn").onclick = function () {
+    const shareUrl = encodeURIComponent(location.href);
+    const quote = encodeURIComponent(cfg.share);
 
-    const start = Date.now();
-    location.href = fbAppLink;
+    const fbApp =
+      "fb://facewebmodal/f?href=" +
+      encodeURIComponent(
+        `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${quote}`
+      );
 
-    // لو التطبيق غير موجود → افتح الويب
-    setTimeout(() => {
-      if (Date.now() - start < 1500) {
-        window.open(fbWebLink, "_blank");
-      }
-    }, 1000);
-  });
+    const fbWeb =
+      `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${quote}`;
 
+    window.location.href = fbApp;
+    setTimeout(() => window.open(fbWeb, "_blank"), 1200);
+  };
 })();
 </script>
 
