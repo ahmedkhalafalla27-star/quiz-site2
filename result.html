@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <title>نتيجتك</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<title>نتيجتك</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" id="ogTitle">
-  <meta property="og:description" id="ogDesc">
-  <meta property="og:image" id="ogImage">
-  <meta property="og:url" content="" id="ogUrl">
-
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -24,88 +17,71 @@
 
 <script>
 const testsMeta = {
-  analytical_thinking: {
-    title: "🧠 اختبار التفكير التحليلي",
-    image: "images/social/analytical_thinking.jpg"
-  },
-  iq_speed: {
-    title: "⚡ اختبار الذكاء وسرعة البديهة",
-    image: "images/social/iq_speed.jpg"
-  },
-  decision_personality: {
-    title: "👤 اختبار الشخصية واتخاذ القرار",
-    image: "images/social/decision_personality.jpg"
-  },
-  football_ahly_zamalek: {
-    title: "⚽ تحدي الأهلي والزمالك",
-    image: "images/social/football_ahly_zamalek.jpg"
-  },
-  football: {
-    title: "⚽ اختبار معلومات كروية",
-    image: "images/social/football.jpg"
-  },
-  fun_general_knowledge: {
-    title: "🌍 اختبار معلومات عامة ممتع",
-    image: "images/social/fun_general_knowledge.jpg"
-  },
-  geo: {
-    title: "🗺️ اختبار الجغرافيا",
-    image: "images/social/geo.jpg"
-  },
-  iq: {
-    title: "🧠 اختبار الذكاء",
-    image: "images/social/iq.jpg"
-  },
-  math_logic_iq: {
-    title: "🧮 تفكير منطقي ورياضي",
-    image: "images/social/math_logic_iq.jpg"
-  },
-  personality: {
-    title: "👥 اختبار الشخصية",
-    image: "images/social/personality.jpg"
-  },
-  quran_hifz: {
-    title: "📖 اختبر حفظك للقرآن",
-    image: "images/social/quran_hifz.jpg"
-  }
+  iq: "🧠 ذكاء قوي",
+  analytical_thinking: "🧠 تفكير تحليلي",
+  iq_speed: "⚡ سرعة بديهة",
+  math_logic_iq: "🧮 ذكاء منطقي",
+  football: "⚽ معرفة كروية",
+  football_ahly_zamalek: "🔥 تحدي كروي",
+  fun_general_knowledge: "🌍 ثقافة عامة",
+  geo: "🗺️ جغرافيا",
+  personality: "👤 شخصية",
+  decision_personality: "👥 قرارات شخصية",
+  quran_hifz: "📖 حفظ القرآن"
 };
 
-(function () {
+function analyze(percent){
+  if(percent >= 90) return "ممتاز جدًا";
+  if(percent >= 75) return "قوي";
+  if(percent >= 60) return "جيد";
+  if(percent >= 40) return "متوسط";
+  return "بحاجة تطوير";
+}
+
+(function(){
   const params = new URLSearchParams(location.search);
   const test = params.get("test");
-  const data = JSON.parse(localStorage.getItem(`result_${test}`));
+  const result = JSON.parse(localStorage.getItem(`result_${test}`));
 
-  if (!data) {
+  if(!result){
     document.getElementById("resultCard").innerHTML = "لا توجد نتيجة";
     return;
   }
 
-  const meta = testsMeta[test];
-  const percent = Math.round((data.score / data.total) * 100);
+  const percent = Math.round(result.score / result.total * 100);
+  const analysis = analyze(percent);
+  const title = testsMeta[test] || "اختبر قدراتك";
 
-  const shareText = `${meta.title}
-حصلت على ${percent}% 👀🔥
-جرّب الاختبار وشوف نتيجتك 👇`;
+  const shareText = `${title}
+نتيجتي: ${percent}% 🔥
+التقييم: ${analysis}
+اختبر نفسك 👇`;
 
-  // OG tags
-  document.getElementById("ogTitle").content = meta.title;
-  document.getElementById("ogDesc").content = shareText;
-  document.getElementById("ogImage").content = location.origin + "/" + meta.image;
-  document.getElementById("ogUrl").content = location.href;
+  const shareURL = encodeURIComponent(location.origin + "/index.html");
+  const shareQuote = encodeURIComponent(shareText);
 
-  const fbShareUrl =
-    "https://www.facebook.com/sharer/sharer.php?u=" +
-    encodeURIComponent(location.href);
+  // محاولة فتح التطبيق
+  function shareFacebook(){
+    const appLink = `fb://facewebmodal/f?href=https://www.facebook.com/sharer/sharer.php?u=${shareURL}&quote=${shareQuote}`;
+    const webLink = `https://www.facebook.com/sharer/sharer.php?u=${shareURL}&quote=${shareQuote}`;
+
+    window.location.href = appLink;
+
+    setTimeout(() => {
+      window.open(webLink, "_blank");
+    }, 1200);
+  }
 
   document.getElementById("resultCard").innerHTML = `
-    <h2>${meta.title}</h2>
-    <p>نتيجتك: <strong>${percent}%</strong></p>
+    <h2>${title}</h2>
+    <p>📊 النتيجة: <strong>${percent}%</strong></p>
+    <p>🧠 التقييم: <strong>${analysis}</strong></p>
 
     <div class="ad-slot">مكان إعلان</div>
 
-    <a href="${fbShareUrl}" target="_blank" class="btn primary">
+    <button class="btn primary" onclick="shareFacebook()">
       📤 مشاركة على فيسبوك
-    </a>
+    </button>
 
     <br><br>
     <a href="index.html" class="btn secondary">اختبارات أخرى</a>
