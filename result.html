@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <title>نتيجتك</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <main class="centered">
@@ -16,16 +16,17 @@
 </main>
 
 <script>
+/* ========= بيانات الاختبارات ========= */
 const testsMeta = {
-  iq: "🧠 ذكاء قوي",
-  analytical_thinking: "🧠 تفكير تحليلي",
+  iq: "🧠 اختبار ذكاء",
+  analytical_thinking: "🧠 التفكير التحليلي",
   iq_speed: "⚡ سرعة بديهة",
   math_logic_iq: "🧮 ذكاء منطقي",
-  football: "⚽ معرفة كروية",
-  football_ahly_zamalek: "🔥 تحدي كروي",
-  fun_general_knowledge: "🌍 ثقافة عامة",
+  football: "⚽ معلومات كروية",
+  football_ahly_zamalek: "🔥 الأهلي × الزمالك",
+  fun_general_knowledge: "🌍 معلومات عامة",
   geo: "🗺️ جغرافيا",
-  personality: "👤 شخصية",
+  personality: "👤 اختبار شخصية",
   decision_personality: "👥 قرارات شخصية",
   quran_hifz: "📖 حفظ القرآن"
 };
@@ -38,39 +39,32 @@ function analyze(percent){
   return "بحاجة تطوير";
 }
 
+/* ========= متغيرات Global للمشاركة ========= */
+let SHARE_TEXT = "";
+let SHARE_URL = "";
+
+/* ========= تحميل النتيجة ========= */
 (function(){
   const params = new URLSearchParams(location.search);
   const test = params.get("test");
-  const result = JSON.parse(localStorage.getItem(`result_${test}`));
+  const raw = localStorage.getItem(`result_${test}`);
 
-  if(!result){
-    document.getElementById("resultCard").innerHTML = "لا توجد نتيجة";
+  if(!raw){
+    document.getElementById("resultCard").innerHTML = "لا توجد نتيجة محفوظة";
     return;
   }
 
+  const result = JSON.parse(raw);
   const percent = Math.round(result.score / result.total * 100);
   const analysis = analyze(percent);
   const title = testsMeta[test] || "اختبر قدراتك";
 
-  const shareText = `${title}
-نتيجتي: ${percent}% 🔥
+  SHARE_TEXT = `${title}
+نتيجتي: ${percent}%
 التقييم: ${analysis}
-اختبر نفسك 👇`;
+اختبر نفسك الآن 👇`;
 
-  const shareURL = encodeURIComponent(location.origin + "/index.html");
-  const shareQuote = encodeURIComponent(shareText);
-
-  // محاولة فتح التطبيق
-  function shareFacebook(){
-    const appLink = `fb://facewebmodal/f?href=https://www.facebook.com/sharer/sharer.php?u=${shareURL}&quote=${shareQuote}`;
-    const webLink = `https://www.facebook.com/sharer/sharer.php?u=${shareURL}&quote=${shareQuote}`;
-
-    window.location.href = appLink;
-
-    setTimeout(() => {
-      window.open(webLink, "_blank");
-    }, 1200);
-  }
+  SHARE_URL = location.origin + "/index.html";
 
   document.getElementById("resultCard").innerHTML = `
     <h2>${title}</h2>
@@ -87,6 +81,23 @@ function analyze(percent){
     <a href="index.html" class="btn secondary">اختبارات أخرى</a>
   `;
 })();
+
+/* ========= دالة المشاركة (GLOBAL) ========= */
+function shareFacebook(){
+  const url = encodeURIComponent(SHARE_URL);
+  const text = encodeURIComponent(SHARE_TEXT);
+
+  // محاولة فتح تطبيق فيسبوك
+  const appLink = `fb://facewebmodal/f?href=https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+  const webLink = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+
+  window.location.href = appLink;
+
+  // لو التطبيق مش موجود
+  setTimeout(() => {
+    window.open(webLink, "_blank");
+  }, 1200);
+}
 </script>
 
 </body>
