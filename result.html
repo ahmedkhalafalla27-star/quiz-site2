@@ -16,7 +16,6 @@
 </main>
 
 <script>
-/* ========= بيانات الاختبارات ========= */
 const testsMeta = {
   iq: "🧠 اختبار ذكاء",
   analytical_thinking: "🧠 التفكير التحليلي",
@@ -39,65 +38,51 @@ function analyze(percent){
   return "بحاجة تطوير";
 }
 
-/* ========= متغيرات Global للمشاركة ========= */
-let SHARE_TEXT = "";
-let SHARE_URL = "";
+const params = new URLSearchParams(location.search);
+const test = params.get("test");
+const raw = localStorage.getItem(`result_${test}`);
 
-/* ========= تحميل النتيجة ========= */
-(function(){
-  const params = new URLSearchParams(location.search);
-  const test = params.get("test");
-  const raw = localStorage.getItem(`result_${test}`);
+if(!raw){
+  document.getElementById("resultCard").innerHTML = "لا توجد نتيجة";
+  throw "";
+}
 
-  if(!raw){
-    document.getElementById("resultCard").innerHTML = "لا توجد نتيجة محفوظة";
-    return;
-  }
+const result = JSON.parse(raw);
+const percent = Math.round(result.score / result.total * 100);
+const analysis = analyze(percent);
+const title = testsMeta[test] || "اختبر قدراتك";
 
-  const result = JSON.parse(raw);
-  const percent = Math.round(result.score / result.total * 100);
-  const analysis = analyze(percent);
-  const title = testsMeta[test] || "اختبر قدراتك";
-
-  SHARE_TEXT = `${title}
+const shareText = `${title}
 نتيجتي: ${percent}%
 التقييم: ${analysis}
 اختبر نفسك الآن 👇`;
 
-  SHARE_URL = location.origin + "/index.html";
+const shareURL = location.origin + "/index.html";
 
-  document.getElementById("resultCard").innerHTML = `
-    <h2>${title}</h2>
-    <p>📊 النتيجة: <strong>${percent}%</strong></p>
-    <p>🧠 التقييم: <strong>${analysis}</strong></p>
+document.getElementById("resultCard").innerHTML = `
+  <h2>${title}</h2>
+  <p>📊 نتيجتك: <strong>${percent}%</strong></p>
+  <p>🧠 التقييم: <strong>${analysis}</strong></p>
 
-    <div class="ad-slot">مكان إعلان</div>
+  <div class="ad-slot">مكان إعلان</div>
 
-    <button class="btn primary" onclick="shareFacebook()">
-      📤 مشاركة على فيسبوك
-    </button>
+  <button class="btn primary" id="shareBtn">
+    📤 مشاركة على فيسبوك
+  </button>
 
-    <br><br>
-    <a href="index.html" class="btn secondary">اختبارات أخرى</a>
-  `;
-})();
+  <br><br>
+  <a href="index.html" class="btn secondary">اختبارات أخرى</a>
+`;
 
-/* ========= دالة المشاركة (GLOBAL) ========= */
-function shareFacebook(){
-  const url = encodeURIComponent(SHARE_URL);
-  const text = encodeURIComponent(SHARE_TEXT);
+/* ========= ربط الزر ========= */
+document.getElementById("shareBtn").addEventListener("click", function () {
+  const url = encodeURIComponent(shareURL);
+  const text = encodeURIComponent(shareText);
 
-  // محاولة فتح تطبيق فيسبوك
-  const appLink = `fb://facewebmodal/f?href=https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
-  const webLink = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+  const fbShare = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
 
-  window.location.href = appLink;
-
-  // لو التطبيق مش موجود
-  setTimeout(() => {
-    window.open(webLink, "_blank");
-  }, 1200);
-}
+  window.open(fbShare, "_blank");
+});
 </script>
 
 </body>
