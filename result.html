@@ -2,20 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- ===== Open Graph (Facebook) ===== -->
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="اختبر قدراتك">
-  <meta property="og:title" id="ogTitle" content="اختبر قدراتك">
-  <meta property="og:description" id="ogDesc" content="اكتشف مستواك الحقيقي الآن">
-  <meta property="og:image" id="ogImage" content="assets/social/default.jpg">
-  <meta property="og:url" id="ogUrl" content="">
-
   <title>نتيجتك</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" id="ogTitle">
+  <meta property="og:description" id="ogDesc">
+  <meta property="og:image" id="ogImage">
+  <meta property="og:url" content="" id="ogUrl">
+
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <main class="centered">
@@ -25,119 +23,93 @@
 </main>
 
 <script>
-/* ===== إعدادات المشاركة حسب نوع الاختبار ===== */
-const TEST_CONFIG = {
-  iq: {
-    title: "🧠 اختبار الذكاء",
-    share: "🔥 اختبرت ذكائي وطلعت نتيجة قوية! جرب الاختبار وشوف مستواك 👇",
-    image: "assets/social/iq.jpg"
+const testsMeta = {
+  analytical_thinking: {
+    title: "🧠 اختبار التفكير التحليلي",
+    image: "images/social/analytical_thinking.jpg"
   },
-  personality: {
-    title: "👤 اختبار الشخصية",
-    share: "👀 طلعت شخصيتي مختلفة عن المتوقع! جرب واعرف شخصيتك 👇",
-    image: "assets/social/personality.jpg"
+  iq_speed: {
+    title: "⚡ اختبار الذكاء وسرعة البديهة",
+    image: "images/social/iq_speed.jpg"
   },
-  math_logic_iq: {
-    title: "🧮 اختبار التفكير المنطقي",
-    share: "🧮 اختبار منطقي محتاج تركيز! تقدر تعديه؟ 👇",
-    image: "assets/social/math.jpg"
+  decision_personality: {
+    title: "👤 اختبار الشخصية واتخاذ القرار",
+    image: "images/social/decision_personality.jpg"
+  },
+  football_ahly_zamalek: {
+    title: "⚽ تحدي الأهلي والزمالك",
+    image: "images/social/football_ahly_zamalek.jpg"
   },
   football: {
-    title: "⚽ اختبار كروي",
-    share: "⚽ تحدي كروي جامد! جرب معلوماتك 👇",
-    image: "assets/social/football.jpg"
-  },
-  geo: {
-    title: "🌍 اختبار جغرافيا",
-    share: "🌍 معلومات جغرافية هتخليك تعيد التفكير 👇",
-    image: "assets/social/geo.jpg"
+    title: "⚽ اختبار معلومات كروية",
+    image: "images/social/football.jpg"
   },
   fun_general_knowledge: {
-    title: "💡 معلومات عامة",
-    share: "💡 أسئلة مش مملة خالص! جرب بنفسك 👇",
-    image: "assets/social/general.jpg"
+    title: "🌍 اختبار معلومات عامة ممتع",
+    image: "images/social/fun_general_knowledge.jpg"
+  },
+  geo: {
+    title: "🗺️ اختبار الجغرافيا",
+    image: "images/social/geo.jpg"
+  },
+  iq: {
+    title: "🧠 اختبار الذكاء",
+    image: "images/social/iq.jpg"
+  },
+  math_logic_iq: {
+    title: "🧮 تفكير منطقي ورياضي",
+    image: "images/social/math_logic_iq.jpg"
+  },
+  personality: {
+    title: "👥 اختبار الشخصية",
+    image: "images/social/personality.jpg"
   },
   quran_hifz: {
     title: "📖 اختبر حفظك للقرآن",
-    share: "📖 اختبرت حفظي للقرآن.. هل تستطيع؟ 👇",
-    image: "assets/social/quran.jpg"
+    image: "images/social/quran_hifz.jpg"
   }
 };
 
-/* ===== تحليل النتيجة ===== */
-function analyze(percent) {
-  if (percent >= 85) return "🔥 مستوى ممتاز جدًا";
-  if (percent >= 65) return "💪 مستوى قوي";
-  if (percent >= 45) return "👍 مستوى متوسط";
-  return "📘 يحتاج تدريب";
-}
-
-/* ===== عرض النتيجة ===== */
 (function () {
   const params = new URLSearchParams(location.search);
-  const test = params.get("test") || "iq";
-
-  const cfg = TEST_CONFIG[test] || {
-    title: "اختبر قدراتك",
-    share: "جرب اختبر قدراتك واعرف مستواك الحقيقي 👇",
-    image: "assets/social/default.jpg"
-  };
-
-  const data = localStorage.getItem(`result_${test}`) ||
-               localStorage.getItem(`quiz_${test}_latest`);
+  const test = params.get("test");
+  const data = JSON.parse(localStorage.getItem(`result_${test}`));
 
   if (!data) {
-    document.getElementById("resultCard").innerHTML = `
-      <h2>لا توجد نتيجة</h2>
-      <a class="btn primary" href="index.html">العودة للرئيسية</a>
-    `;
+    document.getElementById("resultCard").innerHTML = "لا توجد نتيجة";
     return;
   }
 
-  const result = JSON.parse(data);
-  const percent = Math.round((result.score / result.total) * 100);
-  const analysis = analyze(percent);
+  const meta = testsMeta[test];
+  const percent = Math.round((data.score / data.total) * 100);
 
-  /* تحديث OG */
-  document.getElementById("ogTitle").content = cfg.title;
-  document.getElementById("ogDesc").content = cfg.share;
-  document.getElementById("ogImage").content = location.origin + "/" + cfg.image;
+  const shareText = `${meta.title}
+حصلت على ${percent}% 👀🔥
+جرّب الاختبار وشوف نتيجتك 👇`;
+
+  // OG tags
+  document.getElementById("ogTitle").content = meta.title;
+  document.getElementById("ogDesc").content = shareText;
+  document.getElementById("ogImage").content = location.origin + "/" + meta.image;
   document.getElementById("ogUrl").content = location.href;
 
+  const fbShareUrl =
+    "https://www.facebook.com/sharer/sharer.php?u=" +
+    encodeURIComponent(location.href);
+
   document.getElementById("resultCard").innerHTML = `
-    <h2>${cfg.title}</h2>
+    <h2>${meta.title}</h2>
+    <p>نتيجتك: <strong>${percent}%</strong></p>
 
-    <div class="circle">${percent}%</div>
+    <div class="ad-slot">مكان إعلان</div>
 
-    <h3>${analysis}</h3>
-    <p>إجابات صحيحة: <b>${result.score}</b> من <b>${result.total}</b></p>
+    <a href="${fbShareUrl}" target="_blank" class="btn primary">
+      📤 مشاركة على فيسبوك
+    </a>
 
-    <div class="ad-slot">إعلان هنا</div>
-
-    <div style="margin-top:20px">
-      <button class="btn primary" id="shareBtn">📤 مشاركة على فيسبوك</button>
-      <br><br>
-      <a class="btn ghost" href="index.html">اختبارات أخرى</a>
-    </div>
+    <br><br>
+    <a href="index.html" class="btn secondary">اختبارات أخرى</a>
   `;
-
-  /* زر المشاركة */
-  document.getElementById("shareBtn").onclick = function () {
-    const shareUrl = encodeURIComponent(location.href);
-    const quote = encodeURIComponent(cfg.share);
-
-    const fbApp =
-      "fb://facewebmodal/f?href=" +
-      encodeURIComponent(
-        `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${quote}`
-      );
-
-    const fbWeb =
-      `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${quote}`;
-
-    window.location.href = fbApp;
-    setTimeout(() => window.open(fbWeb, "_blank"), 1200);
-  };
 })();
 </script>
 
