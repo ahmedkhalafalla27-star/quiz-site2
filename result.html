@@ -1,28 +1,44 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <title>النتيجة</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>النتيجة</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <main class="centered">
-  <div id="resultCard" class="result-card"></div>
+  <div class="card result-card" id="result"></div>
 </main>
 
-<script>
-  const params = new URLSearchParams(location.search);
-  const test = params.get("test");
-  const result = JSON.parse(localStorage.getItem(`quiz_${test}_latest`));
+<div class="ad-slot">إعلان AdSense</div>
 
-  document.getElementById("resultCard").innerHTML = `
-    <h2>🎉 نتيجتك</h2>
-    <p>النتيجة: ${result.score} من ${result.total}</p>
-    <p>النسبة: ${result.percent}%</p>
-    <a href="index.html" class="btn primary">🔁 اختبارات أخرى</a>
-  `;
+<script>
+const params = new URLSearchParams(location.search);
+const test = params.get("test");
+const data = JSON.parse(localStorage.getItem(`result_${test}`));
+
+const percent = Math.round(data.score / data.total * 100);
+
+let level = "متوسط";
+if (percent >= 85) level = "ممتاز";
+else if (percent >= 65) level = "جيد";
+else if (percent < 40) level = "ضعيف";
+
+document.getElementById("result").innerHTML = `
+  <h2>نتيجتك ${percent}%</h2>
+  <p>تقييمك: <strong>${level}</strong></p>
+
+  <a class="btn primary"
+     target="_blank"
+     href="https://www.facebook.com/sharer/sharer.php?u=${location.origin}">
+     مشاركة على فيسبوك
+  </a>
+
+  <br><br>
+  <a href="index.html">اختبارات أخرى</a>
+`;
 </script>
 
 </body>
