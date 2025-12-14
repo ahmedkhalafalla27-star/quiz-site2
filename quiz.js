@@ -1,56 +1,75 @@
-const TIME = 45;
+const TIME_PER_QUESTION = 45;
+
 let QUESTIONS = [];
 let index = 0;
 let answers = [];
+let remaining = TIME_PER_QUESTION;
 let timer;
-let remaining = TIME;
 
-const test = new URLSearchParams(location.search).get("test");
+const params = new URLSearchParams(location.search);
+const test = params.get("test");
+
 const card = document.getElementById("quizCard");
 
-fetch(`data/${test}.json`)
-  .then(res => res.json())
-  .then(data => {
-    QUESTIONS = data;
-    answers = Array(QUESTIONS.length).fill(null);
-    render();
-  });
+async function loadQuestions() {
+  try {
+    const res = await fetch(`data/${test}.json`);
+    QUESTIONS = await res.json();
+    answers = new Array(QUESTIONS.length).fill(null);
+    renderQuestion();
+  } catch {
+    card.innerHTML = "فشل تحميل الأسئلة";
+  }
+}
 
-function render() {
-  if (index >= QUESTIONS.length) return finish();
+function renderQuestion() {
+  if (index >= QUESTIONS.length) {
+    finish();
+    return;
+  }
 
   const q = QUESTIONS[index];
+
   card.innerHTML = `
-    <div class="q-header">
-      ⏱️ <span id="timer">${remaining}</span> | سؤال ${index + 1}/${QUESTIONS.length}
+    <div class="card-inner">
+      <div class="card-header">
+        <div>⏳ <span id="timer">${remaining}</span></div>
+        <div>${index + 1} / ${QUESTIONS.length}</div>
+      </div>
+
+      <div class="q-text">${q.question}</div>
+
+      <div class="answers">
+        ${q.options.map((o, i) => `
+          <div class="answer" onclick="selectAnswer(${i})">
+            ${o}
+          </div>
+        `).join("")}
+      </div>
+
+      <button class="btn primary" onclick="next()">التالي</button>
     </div>
-    <div class="q-text">${q.question}</div>
-    <div class="answers">
-      ${q.options.map((o, i) => `
-        <div class="answer" onclick="select(${i})">${o}</div>
-      `).join("")}
-    </div>
-    <button class="btn primary" onclick="next()">التالي</button>
   `;
+
   startTimer();
 }
 
-function select(i) {
+function selectAnswer(i) {
   answers[index] = i;
 }
 
 function next() {
   clearInterval(timer);
-  remaining = TIME;
+  remaining = TIME_PER_QUESTION;
   index++;
-  render();
+  renderQuestion();
 }
 
 function startTimer() {
   timer = setInterval(() => {
     remaining--;
     document.getElementById("timer").textContent = remaining;
-    if (remaining === 0) next();
+    if (remaining <= 0) next();
   }, 1000);
 }
 
@@ -60,11 +79,12 @@ function finish() {
     if (answers[i] === q.answer) score++;
   });
 
-  localStorage.setItem(`quiz_${test}_latest`, JSON.stringify({
+  localStorage.setItem(`result_${test}`, JSON.stringify({
     score,
-    total: QUESTIONS.length,
-    percent: Math.round(score / QUESTIONS.length * 100)
+    total: QUESTIONS.length
   }));
 
   location.href = `result.html?test=${test}`;
 }
+
+loadQuestions();
