@@ -1,93 +1,152 @@
+// quiz.js — نسخة نهائية مستقرة
+
 const TIME_PER_QUESTION = 45;
 
 let QUESTIONS = [];
 let index = 0;
 let answers = [];
 let remaining = TIME_PER_QUESTION;
-let timer;
+let timer = null;
 
 const params = new URLSearchParams(location.search);
-const test = params.get("test");
+const test = params.get("test") || "iq";
 
 const card = document.getElementById("quizCard");
 
+// تحميل الأسئلة
 async function loadQuestions() {
   try {
-    const res = await fetch(`data/${test}.json`);
+    const res = await fetch(`data/${test}.json?v=${Date.now()}`);
+    if (!res.ok) throw new Error("فشل تحميل الأسئلة");
     QUESTIONS = await res.json();
-    answers = new Array(QUESTIONS.length).fill(null);
+
+    // استرجاع التقدم إن وجد
+    const savedIndex = localStorage.getItem(`quiz_${test}_index`);
+    const savedAnswers = localStorage.getItem(`quiz_${test}_answers`);
+
+    index = savedIndex ? Number(savedIndex) : 0;
+    answers = savedAnswers
+      ? JSON.parse(savedAnswers)
+      : new Array(QUESTIONS.length).fill(null);
+
     renderQuestion();
-  } catch {
-    card.innerHTML = "فشل تحميل الأسئلة";
+  } catch (e) {
+    card.innerHTML = "❌ فشل تحميل الأسئلة";
   }
 }
 
 function renderQuestion() {
-  if (index >= QUESTIONS.length) return finish();
+  if (index >= QUESTIONS.length) {
+    finish();
+    return;
+  }
 
   const q = QUESTIONS[index];
 
   card.innerHTML = `
-  <div class="card-inner">
-    <div class="card-header">
-      <div>⏳ <span id="timer">${remaining}</span></div>
-      <div>${index + 1} / ${QUESTIONS.length}</div>
+    <div class="card-inner">
+      <div class="card-header">
+        <div>⏳ <span id="timer">${remaining}</span> ثانية</div>
+        <div>${index + 1} / ${QUESTIONS.length}</div>
+      </div>
+
+      <div class="q-text">${q.question}</div>
+
+      <div class="answers">
+        ${q.options
+          .map(
+            (o, i) => `
+          <div class="answer ${
+            answers[index] === i ? "selected" : ""
+          }" onclick="selectAnswer(${i})">
+            ${typeof o === "string" ? o : o.text}
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+
+      <button class="btn primary" onclick="nextQuestion()">التالي</button>
     </div>
-
-    <div class="q-text">${q.question}</div>
-
-    <div class="answers">
-      ${q.options.map((o,i)=>`
-        <div class="answer" onclick="selectAnswer(${i})">${o}</div>
-      `).join("")}
-    </div>
-
-    <button id="nextBtn" class="btn primary" disabled>التالي</button>
-  </div>
   `;
 
-  document.getElementById("nextBtn").onclick = next;
   startTimer();
 }
 
-function selectAnswer(i){
-  answers[index]=i;
-  document.getElementById("nextBtn").disabled=false;
+// اختيار إجابة
+function selectAnswer(i) {
+  answers[index] = i;
+
+  // تحديث الواجهة
+  document.querySelectorAll(".answer").forEach((el) =>
+    el.classList.remove("selected")
+  );
+  document.querySelectorAll(".answer")[i].classList.add("selected");
+
+  saveProgress();
 }
 
-function next(){
+// الانتقال للسؤال التالي
+function nextQuestion() {
+  if (answers[index] === null) {
+    alert("⚠️ لازم تختار إجابة قبل المتابعة");
+    return;
+  }
+
   clearInterval(timer);
   remaining = TIME_PER_QUESTION;
   index++;
+  saveProgress();
   renderQuestion();
 }
 
-function startTimer(){
-  timer = setInterval(()=>{
+// المؤقت
+function startTimer() {
+  clearInterval(timer);
+
+  timer = setInterval(() => {
     remaining--;
-    document.getElementById("timer").textContent=remaining;
-    if(remaining<=0){
+    document.getElementById("timer").textContent = remaining;
+
+    if (remaining <= 0) {
       clearInterval(timer);
-      index++;
       remaining = TIME_PER_QUESTION;
+      index++;
+      saveProgress();
       renderQuestion();
     }
-  },1000);
+  }, 1000);
 }
 
-function finish(){
-  let score=0;
-  QUESTIONS.forEach((q,i)=>{
-    if(answers[i]===q.answer) score++;
+// حفظ التقدم
+function saveProgress() {
+  localStorage.setItem(`quiz_${test}_index`, index);
+  localStorage.setItem(`quiz_${test}_answers`, JSON.stringify(answers));
+}
+
+// إنهاء الاختبار
+function finish() {
+  clearInterval(timer);
+
+  let score = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (answers[i] === q.answer) score++;
   });
 
-  localStorage.setItem(`result_${test}`,JSON.stringify({
-    score,
-    total: QUESTIONS.length,
-    percent: Math.round(score/QUESTIONS.length*100)
-  }));
+  localStorage.setItem(
+    `quiz_${test}_latest`,
+    JSON.stringify({
+      score,
+      total: QUESTIONS.length,
+      percent: Math.round((score / QUESTIONS.length) * 100),
+    })
+  );
 
-  location.href=`result.html?test=${test}`;
+  localStorage.removeItem(`quiz_${test}_index`);
+  localStorage.removeItem(`quiz_${test}_answers`);
+
+  location.href = `result.html?test=${test}`;
 }
 
+// تشغيل
 loadQuestions();
