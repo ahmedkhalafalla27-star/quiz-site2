@@ -1,52 +1,30 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>بدء الاختبار</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ابدأ الاختبار | اختبر قدراتك</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <main class="centered">
-    <div class="card start-card">
-      <h2 id="testTitle">جاهز للاختبار؟</h2>
-      <p id="testDesc">25 سؤال – ركّز وجاوب بسرعة</p>
+<main class="centered">
+  <div class="card result-card">
+    <h2>جاهز للاختبار؟</h2>
+    <p>اضغط زر ابدأ لبدء الاختبار فورًا</p>
 
-      <!-- إعلان -->
-      <div class="ad-slot">
-        مكان إعلان AdSense
-      </div>
+    <div class="ad-slot">إعلان</div>
 
-      <div class="start-wrapper">
-        <a id="startBtn" class="start-btn">ابدأ الاختبار</a>
-      </div>
-    </div>
-  </main>
+    <a id="startBtn" class="btn primary">ابدأ الآن</a>
+
+    <div class="ad-slot">إعلان</div>
+  </div>
+</main>
 
 <script>
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(location.search);
 const test = params.get("test");
-
-const testsInfo = {
-  iq: "اختبار ذكاء",
-  dataiq_speed: "ذكاء وسرعة بديهة",
-  analytical_thinking: "تفكير تحليلي",
-  math_logic_iq: "ذكاء رياضي ومنطقي",
-  personality: "اختبار شخصية",
-  decision_personality: "قرارات وشخصية",
-  football: "معلومات كروية",
-  datafootball_ahly_zamalek: "الأهلي والزمالك",
-  geo: "معلومات جغرافية",
-  fun_general_knowledge: "معلومات عامة ممتعة",
-  quran_hifz: "اختبر حفظك للقرآن"
-};
-
-document.getElementById("testTitle").textContent =
-  testsInfo[test] || "اختبار";
-
-document.getElementById("startBtn").href =
-  `quiz.html?test=${test}`;
+document.getElementById("startBtn").href = `quiz.html?test=${test}`;
 </script>
 
 </body>
