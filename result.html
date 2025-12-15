@@ -1,88 +1,39 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<title>نتيجتك</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<title>نتيجتك | اختبر قدراتك</title>
+<meta name="description" content="شاهد نتيجتك وتحليل مستواك في اختبار اختبر قدراتك." />
+
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <main class="centered">
-  <div class="card result-card" id="resultCard">
-    جاري تحميل النتيجة...
-  </div>
+  <div class="card result-card" id="resultCard"></div>
 </main>
 
 <script>
-const testsMeta = {
-  iq: "🧠 اختبار ذكاء",
-  analytical_thinking: "🧠 التفكير التحليلي",
-  iq_speed: "⚡ سرعة بديهة",
-  math_logic_iq: "🧮 ذكاء منطقي",
-  football: "⚽ معلومات كروية",
-  football_ahly_zamalek: "🔥 الأهلي × الزمالك",
-  fun_general_knowledge: "🌍 معلومات عامة",
-  geo: "🗺️ جغرافيا",
-  personality: "👤 اختبار شخصية",
-  decision_personality: "👥 قرارات شخصية",
-  quran_hifz: "📖 حفظ القرآن"
-};
-
-function analyze(percent){
-  if(percent >= 90) return "ممتاز جدًا";
-  if(percent >= 75) return "قوي";
-  if(percent >= 60) return "جيد";
-  if(percent >= 40) return "متوسط";
-  return "بحاجة تطوير";
-}
-
 const params = new URLSearchParams(location.search);
 const test = params.get("test");
-const raw = localStorage.getItem(`result_${test}`);
+const data = JSON.parse(localStorage.getItem(`result_${test}`));
 
-if(!raw){
-  document.getElementById("resultCard").innerHTML = "لا توجد نتيجة";
-  throw "";
-}
+let level="بحاجة لتحسين";
+if(data.percent>=85) level="ممتاز";
+else if(data.percent>=65) level="جيد جدًا";
+else if(data.percent>=45) level="متوسط";
 
-const result = JSON.parse(raw);
-const percent = Math.round(result.score / result.total * 100);
-const analysis = analyze(percent);
-const title = testsMeta[test] || "اختبر قدراتك";
+document.getElementById("resultCard").innerHTML=`
+<h2>نتيجتك: ${data.percent}%</h2>
+<div class="circle">${data.score} / ${data.total}</div>
+<h3>${level}</h3>
 
-const shareText = `${title}
-نتيجتي: ${percent}%
-التقييم: ${analysis}
-اختبر نفسك الآن 👇`;
+<div class="ad-slot">إعلان</div>
 
-const shareURL = location.origin + "/index.html";
-
-document.getElementById("resultCard").innerHTML = `
-  <h2>${title}</h2>
-  <p>📊 نتيجتك: <strong>${percent}%</strong></p>
-  <p>🧠 التقييم: <strong>${analysis}</strong></p>
-
-  <div class="ad-slot">مكان إعلان</div>
-
-  <button class="btn primary" id="shareBtn">
-    📤 مشاركة على فيسبوك
-  </button>
-
-  <br><br>
-  <a href="index.html" class="btn secondary">اختبارات أخرى</a>
+<a href="index.html" class="btn ghost">اختبارات أخرى</a>
 `;
-
-/* ========= ربط الزر ========= */
-document.getElementById("shareBtn").addEventListener("click", function () {
-  const url = encodeURIComponent(shareURL);
-  const text = encodeURIComponent(shareText);
-
-  const fbShare = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
-
-  window.open(fbShare, "_blank");
-});
 </script>
 
 </body>
