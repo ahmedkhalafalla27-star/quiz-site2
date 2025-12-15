@@ -1,39 +1,94 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-
-<title>نتيجتك | اختبر قدراتك</title>
-<meta name="description" content="شاهد نتيجتك وتحليل مستواك في اختبار اختبر قدراتك." />
-
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>نتيجة الاختبار</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <main class="centered">
-  <div class="card result-card" id="resultCard"></div>
+  <div class="quiz-card" id="resultCard">
+    جاري تحميل النتيجة...
+  </div>
 </main>
 
 <script>
 const params = new URLSearchParams(location.search);
 const test = params.get("test");
-const data = JSON.parse(localStorage.getItem(`result_${test}`));
 
-let level="بحاجة لتحسين";
-if(data.percent>=85) level="ممتاز";
-else if(data.percent>=65) level="جيد جدًا";
-else if(data.percent>=45) level="متوسط";
+const card = document.getElementById("resultCard");
+const resultKey = `quiz_${test}_latest`;
+const result = JSON.parse(localStorage.getItem(resultKey));
 
-document.getElementById("resultCard").innerHTML=`
-<h2>نتيجتك: ${data.percent}%</h2>
-<div class="circle">${data.score} / ${data.total}</div>
-<h3>${level}</h3>
+if (!result) {
+  card.innerHTML = "❌ لا توجد نتيجة محفوظة لهذا الاختبار";
+} else {
+  const percent = result.percent;
 
-<div class="ad-slot">إعلان</div>
+  // ===== تحديد التقييم النصي =====
+  let level = "";
+  let description = "";
 
-<a href="index.html" class="btn ghost">اختبارات أخرى</a>
-`;
+  if (percent >= 90) {
+    level = "ممتاز جدًا 🔥";
+    description = "قدراتك عالية جدًا وتفكيرك سريع ودقيق.";
+  } else if (percent >= 75) {
+    level = "ممتاز 👍";
+    description = "أداء قوي ووعي واضح بالتفاصيل.";
+  } else if (percent >= 60) {
+    level = "جيد 🙂";
+    description = "أداؤك جيد لكن يمكن تحسينه بالممارسة.";
+  } else if (percent >= 40) {
+    level = "مقبول 😐";
+    description = "لديك أساسيات جيدة لكن تحتاج تركيز أكثر.";
+  } else {
+    level = "بحاجة لتطوير ❗";
+    description = "حاول مرة أخرى وركز أكثر في الأسئلة.";
+  }
+
+  // ===== تخصيص حسب نوع الاختبار =====
+  const titles = {
+    iq: "اختبار الذكاء",
+    iq_speed: "اختبار الذكاء وسرعة البديهة",
+    analytical_thinking: "اختبار التفكير التحليلي",
+    math_logic_iq: "اختبار التفكير المنطقي",
+    fun_general_knowledge: "اختبار معلومات عامة",
+    geo: "اختبار الجغرافيا",
+    football: "اختبار معلومات كروية",
+    datafootball_ahly_zamalek: "الأهلي والزمالك",
+    personality: "اختبار الشخصية",
+    decision_personality: "شخصيتك من قراراتك",
+    quran_hifz: "اختبار حفظ القرآن"
+  };
+
+  const testTitle = titles[test] || "نتيجة الاختبار";
+
+  card.innerHTML = `
+    <div class="card-inner result">
+      <h2>${testTitle}</h2>
+
+      <div class="score-circle">
+        <strong>${percent}%</strong>
+      </div>
+
+      <p class="result-level">${level}</p>
+      <p class="result-text">${description}</p>
+
+      <p class="details">
+        عدد الإجابات الصحيحة:
+        <strong>${result.score}</strong> من
+        <strong>${result.total}</strong>
+      </p>
+
+      <div class="controls">
+        <a href="index.html" class="btn secondary">🏠 الرئيسية</a>
+        <a href="start.html?test=${test}" class="btn primary">🔁 أعد الاختبار</a>
+      </div>
+    </div>
+  `;
+}
 </script>
 
 </body>
